@@ -1,10 +1,14 @@
 import speech_recognition as sr
 import webbrowser
 import pyttsx3
+# we can use gTTS also
 import musicLibrary
+import requests
 
 recognizer=sr.Recognizer()
 engine=pyttsx3.init()
+newsapi=""
+# using an api key from news api website.
 
 def speak(text):
     engine.say(text)
@@ -23,6 +27,24 @@ def processCommand(c):
         song = c.lower().split(" ")[1]
         link = musicLibrary.music[song]
         webbrowser.open(link)
+    elif "news" in c.lower():
+        r= requests.get(f"https://newsapi.org/v2/top-headlines?country=in&apiKey={newsapi}")
+        if r.status_code == 200:
+            # Parse the JSON response
+            data = r.json()
+            
+            # Extract the articles
+            articles = data.get('articles', [])
+            
+            # Print the headlines
+            for article in articles:
+                speak(article['title'])
+        
+    else:
+        # we can integrate openai api here to handle other requests.
+        pass
+        
+        
 
 if __name__=="__main__":
     speak("Initialising jarvis...")
